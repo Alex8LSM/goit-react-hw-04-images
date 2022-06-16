@@ -21,15 +21,15 @@ function Gallery() {
   const [endSearch, setIsEndSearch] = useState(false);
 
   useEffect(() => {
-    console.log('Запустився useEffect');
     setImages([]);
     setPage(1);
     setHitsCount(searchParams.per_page);
     setIsEndSearch(false);
   }, [query]);
 
-  const searchImages = async page => {
+  const searchImages = async (page, query) => {
     if (query.trim() === '') {
+      setIsLoading(false);
       return toast.error('The input is empty! Enter something interesting!');
     }
     setIsLoading(true);
@@ -67,21 +67,17 @@ function Gallery() {
     }
   };
 
-  const onhandleChange = e => {
-    setQuery(e.target.value);
-  };
-
-  const onhandleSubmit = e => {
-    e.preventDefault();
+  const onSubmit = query => {
     setIsLoading(true);
+    setQuery(query);
     setPage(1);
-    searchImages(1);
+    searchImages(1, query);
   };
 
   const onLoadMore = () => {
     setIsLoading(true);
     setPage(page + 1);
-    searchImages(page + 1);
+    searchImages(page + 1, query);
     scrollPage();
   };
 
@@ -105,11 +101,7 @@ function Gallery() {
 
   return (
     <div className="container">
-      <Searchbar
-        onHandleSubmit={onhandleSubmit}
-        onSearchQueryChange={onhandleChange}
-        value={query}
-      />
+      <Searchbar onSubmit={onSubmit} />
 
       {images.length > 0 && (
         <ImageGallery images={images} onOpenModal={onOpenModal} />
@@ -156,9 +148,7 @@ export const App = () => {
 //     }
 //   }
 
-//   searchImages = async page => {
-//     const { query } = this.state;
-
+//   searchImages = async (page, query) => {
 //     if (query.trim() === '') {
 //       return toast.error('The input is empty! Enter something interesting!');
 //     }
@@ -201,19 +191,17 @@ export const App = () => {
 //     }
 //   };
 
-//   handleChange = e => {
-//     this.setState({ query: e.target.value });
-//   };
-
-//   handleSubmit = e => {
-//     e.preventDefault();
+//   handleSubmit = query => {
+//     this.setState({ query: query });
 //     this.setState({ page: 1 });
-//     this.searchImages(1);
+//     this.searchImages(1, query);
 //   };
 
 //   onLoadMore = () => {
+//     const { query, page } = this.state;
+
+//     this.searchImages(page + 1, query);
 //     this.setState({ page: this.state.page + 1 });
-//     this.searchImages(this.state.page + 1);
 //     this.scrollPage();
 //   };
 
@@ -237,22 +225,18 @@ export const App = () => {
 //   scrollPage = () => {
 //     setTimeout(() => {
 //       window.scrollBy({
-//         top: document.documentElement.clientHeight - 160,
+//         top: document.documentElement.clientHeight - 100,
 //         behavior: 'smooth',
 //       });
 //     }, 1000);
 //   };
 
 //   render() {
-//     const { query, images, largeImageURL, isLoading, showModal, endSearch } =
+//     const { images, largeImageURL, isLoading, showModal, endSearch } =
 //       this.state;
 //     return (
 //       <div className="container">
-//         <Searchbar
-//           onHandleSubmit={this.handleSubmit}
-//           onSearchQueryChange={this.handleChange}
-//           value={query}
-//         />
+//         <Searchbar onSubmit={this.handleSubmit} />
 
 //         {images.length > 0 && (
 //           <ImageGallery images={images} onOpenModal={this.onOpenModal} />
